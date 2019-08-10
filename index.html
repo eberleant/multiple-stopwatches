@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+	<title>Multiple Stopwatches</title>
+	<link href="./reset.css" type="text/css" rel="stylesheet" media="all">
+	<link href="./multiple-stopwatches_style.css" type="text/css" rel="stylesheet" media="all">
+</head>
+<body>
+	<div id="toolbar">
+		<button>Clear All</button><button>Delete All</button><button id="add-stopwatch">Add a Stopwatch</button><button>Add a Macro</button>
+	</div>
+	<div id="all-stopwatches">
+		<div class="stopwatch 0">
+			<input class="name" type="text" value="Stopwatch 1">
+			<button class="delete"><div>X</div></button>
+			<div class="time"><button>0.00</button></div>
+			<div class="keybind"><span>Keybind: </span><input class="0" type="text" value="a" maxlength="1"></div>
+		</div>
+	</div>
+	<script src="./multiple-stopwatches_script.js"></script>
+</body>

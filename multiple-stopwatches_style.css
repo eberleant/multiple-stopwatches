@@ -1,0 +1,75 @@
+body {
+	background-color: white;
+}
+
+.stopwatch {
+	background-color: cornsilk;
+	display: inline-block;
+	width: 200px;
+	height: 200px;
+	font-family: system-ui;
+	margin: 10px;
+}
+
+.name {
+	box-sizing: border-box;
+	outline: none;
+	background-color: white;
+	font-size: 1.5em;
+	width: 160px;
+	height: 30px;
+	text-align: center;
+	padding: 0;
+	border: 1px solid #d0d0d0;
+}
+
+.delete {
+	outline: none;
+	background-color: #ff3c3c;
+	color: white;
+	font-size: 1em;
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	padding: 0;
+	border: none;
+	float: right;
+	position: relative;
+}
+
+.delete:active {
+	background-color: #ff8484;
+}
+
+.time button{
+	outline: none;
+	display: block;
+	background-color: #ffb2b2;
+	margin: 10px auto;
+	width: 200px;
+	height: 125px;
+	border: 3px solid black;
+	color: black;
+	font-size: 2.5em;
+	font-family: "Courier New";
+}
+
+.time button.going {
+	background-color: #88e888;
+}
+
+.keybind {
+	width: 100px;
+	display: block;
+	margin: 0 auto;
+}
+
+.keybind span {
+	float: left;
+}
+
+.keybind input {
+	float: right;
+	width: 25px;
+	border: 1px solid #d0d0d0;
+}
