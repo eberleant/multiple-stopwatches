@@ -29,12 +29,16 @@ function addStopwatch() {
 	let newKeybind = newStopwatch.querySelector('.keybind input');
 	newKeybind.addEventListener('change', keybindChangeEvent);
 	newKeybind.value = '';
+	newKeybind.addEventListener('focus', disableDrag);
+	newKeybind.addEventListener('focusout', enableDrag);
 
 	let newTimeButton = newStopwatch.querySelector('.time button');
 	newTimeButton.addEventListener('click', clickTimeButtonEvent);
 
 	let newName = newStopwatch.querySelector('.name');
 	newName.value = 'Stopwatch ' + (numIds + 1);
+	newName.addEventListener('focus', disableDrag);
+	newName.addEventListener('focusout', enableDrag);
 
 	let newDelButton = newStopwatch.querySelector('.remove');
 	newDelButton.addEventListener('click', e => removeStopwatch(e.target.parentNode.parentNode));
@@ -46,47 +50,7 @@ function addStopwatch() {
 	newStopwatch.addEventListener('dragover', e => {
 		e.preventDefault();
 	});
-	newStopwatch.addEventListener('dragenter', e => {
-		let dividerParent = e.target;
-		while (!dividerParent.querySelector('.divider')) {
-			dividerParent = dividerParent.parentNode;
-		}
-		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
-		swObj.dropCount++;
-		dividerParent.querySelector('.divider').style.visibility = 'visible';
-	});
-	newStopwatch.addEventListener('dragleave', e => {
-		let dividerParent = e.target;
-		while (!dividerParent.querySelector('.divider')) {
-			dividerParent = dividerParent.parentNode;
-		}
-		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
-		swObj.dropCount--;
-		if (swObj.dropCount === 0) {
-			dividerParent.querySelector('.divider').style.visibility = '';
-		}
-	})
-	newStopwatch.addEventListener('dragstart', e => {
-		let dividerParent = e.target;
-		while (!dividerParent.querySelector('.divider')) {
-			dividerParent = dividerParent.parentNode;
-		}
-		dragged = dividerParent;
-	});
-	newStopwatch.addEventListener('drop', e => {
-		e.preventDefault();
-		let dividerParent = e.target;
-		while (!dividerParent.querySelector('.divider')) {
-			dividerParent = dividerParent.parentNode;
-		}
-		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
-		swObj.dropCount = 0;
-		dividerParent.querySelector('.divider').style.visibility = '';
-		if (dragged.id !== dividerParent.id) {
-			dividerParent.parentNode.removeChild(dragged);
-			dividerParent.parentNode.insertBefore(dragged, dividerParent);
-		}
-	});
+	addDragEvents(newStopwatch);
 
 	let newStopwatchObj = {id: numIds.toString(),
 						name: newName.value,
@@ -101,6 +65,55 @@ function addStopwatch() {
 	allStopwatches.insertBefore(newStopwatch, dividerFinal);
 	numIds++;
 	numStopwatches++;
+}
+
+function disableDrag(e) {
+	e.target.selectionStart = e.target.selectionEnd = 0;
+	getParentStopwatch(e.target).setAttribute('draggable', false);
+}
+
+function enableDrag(e) {
+	getParentStopwatch(e.target).setAttribute('draggable', true);
+}
+
+function addDragEvents(newStopwatch) {
+	newStopwatch.addEventListener('dragenter', e => {
+		let dividerParent = getParentStopwatch(e.target);
+		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
+		swObj.dropCount++;
+		dividerParent.querySelector('.divider').style.visibility = 'visible';
+	});
+	newStopwatch.addEventListener('dragleave', e => {
+		let dividerParent = getParentStopwatch(e.target);
+		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
+		swObj.dropCount--;
+		if (swObj.dropCount === 0) {
+			dividerParent.querySelector('.divider').style.visibility = '';
+		}
+	})
+	newStopwatch.addEventListener('dragstart', e => {
+		let dividerParent = getParentStopwatch(e.target);
+		dragged = dividerParent;
+	});
+	newStopwatch.addEventListener('drop', e => {
+		e.preventDefault();
+		let dividerParent = getParentStopwatch(e.target);
+		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
+		swObj.dropCount = 0;
+		dividerParent.querySelector('.divider').style.visibility = '';
+		if (dragged.id !== dividerParent.id) {
+			dividerParent.parentNode.removeChild(dragged);
+			dividerParent.parentNode.insertBefore(dragged, dividerParent);
+		}
+	});
+}
+
+function getParentStopwatch(child) {
+	let parent = child;
+	while (!parent.id) {
+		parent = parent.parentNode;
+	}
+	return parent;
 }
 
 function clear(sw) {
