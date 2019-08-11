@@ -29,6 +29,7 @@ body {
 	width: 212px;
 	height: 200px;
 	padding: 10px 10px 10px 0;
+	vertical-align: top;
 }
 
 .stopwatch {
@@ -40,21 +41,34 @@ body {
 	font-family: system-ui;
 }
 
-.divider, #divider-final {
+.divider {
 	display: inline-block;
 	background-color: gray;
 	height: 200px;
 	width: 2px;
 	vertical-align: top;
 	visibility: hidden;
-}
-
-.divider {
 	float: left;
 }
 
-#divider-final {
-	margin-top: 10px;
+.stopwatch-divider[id="0"] {
+	background-color: transparent;
+	visibility: hidden;
+}
+
+#final-stopwatch {
+	box-sizing: border-box;
+	border: 1px solid black;
+	position: relative;
+}
+
+#final-stopwatch div {
+	position: absolute;
+	top: 50%;
+	left: 51%;
+	width: 190px;
+	transform: translate(-50%, -50%);
+	font-size: 1em;
 }
 
 .name {

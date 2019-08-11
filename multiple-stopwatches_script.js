@@ -1,12 +1,14 @@
+//tab indexes, add multiple stopwatches at once, add macro keybinds, automatically fill in keyboard shortcuts
+
 const allStopwatches = document.getElementById('all-stopwatches');
 const template = document.getElementById('template');
 const addStopwatchBtn = document.getElementById('add-stopwatch');
 const removeAll = document.getElementById('remove-all');
 const clearAll = document.getElementById('clear-all');
-const dividerFinal = document.getElementById('divider-final');
+const finalBlock = document.getElementById('0');
 let stopwatchArray = [];
 let numStopwatches = 0;
-let numIds = 0;
+let numIds = 1;
 let dragged;
 
 addStopwatchBtn.addEventListener('click', addStopwatch);
@@ -18,6 +20,9 @@ removeAll.addEventListener('click', () => {
 	numIds = 0; //reset IDs, since there is no chance of conflict
 });
 clearAll.addEventListener('click', () => stopwatchArray.forEach(sw => clear(sw.stopwatch)));
+addDragEvents(finalBlock);
+const body = document.querySelector('body');
+stopwatchArray.push({id: "0", dropCount: 0});
 addStopwatch();
 
 setInterval(updateStopwatches, 10);
@@ -29,16 +34,16 @@ function addStopwatch() {
 	let newKeybind = newStopwatch.querySelector('.keybind input');
 	newKeybind.addEventListener('change', keybindChangeEvent);
 	newKeybind.value = '';
-	newKeybind.addEventListener('focus', disableDrag);
-	newKeybind.addEventListener('focusout', enableDrag);
+	newKeybind.addEventListener('focus', e => disableDrag(e, newStopwatch));
+	newKeybind.addEventListener('focusout', e => enableDrag(newStopwatch));
 
 	let newTimeButton = newStopwatch.querySelector('.time button');
 	newTimeButton.addEventListener('click', clickTimeButtonEvent);
 
 	let newName = newStopwatch.querySelector('.name');
-	newName.value = 'Stopwatch ' + (numIds + 1);
-	newName.addEventListener('focus', disableDrag);
-	newName.addEventListener('focusout', enableDrag);
+	newName.value = 'Stopwatch ' + (numIds);
+	newName.addEventListener('focus', e => disableDrag(e, newStopwatch));
+	newName.addEventListener('focusout', e => enableDrag(newStopwatch));
 
 	let newDelButton = newStopwatch.querySelector('.remove');
 	newDelButton.addEventListener('click', e => removeStopwatch(e.target.parentNode.parentNode));
@@ -46,10 +51,6 @@ function addStopwatch() {
 	let newClearButton = newStopwatch.querySelector('.clear');
 	newClearButton.addEventListener('click', e => clear(e.target.parentNode));
 
-	let newDivider = newStopwatch.querySelector('.divider');
-	newStopwatch.addEventListener('dragover', e => {
-		e.preventDefault();
-	});
 	addDragEvents(newStopwatch);
 
 	let newStopwatchObj = {id: numIds.toString(),
@@ -62,45 +63,50 @@ function addStopwatch() {
 						dropCount: 0,
 						};
 	stopwatchArray.push(newStopwatchObj);
-	allStopwatches.insertBefore(newStopwatch, dividerFinal);
+	allStopwatches.insertBefore(newStopwatch, finalBlock);
 	numIds++;
 	numStopwatches++;
 }
 
-function disableDrag(e) {
+function disableDrag(e, newStopwatch) {
 	e.target.selectionStart = e.target.selectionEnd = 0;
-	getParentStopwatch(e.target).setAttribute('draggable', false);
+	newStopwatch.setAttribute('draggable', false);
 }
 
-function enableDrag(e) {
-	getParentStopwatch(e.target).setAttribute('draggable', true);
+function enableDrag(newStopwatch) {
+	newStopwatch.setAttribute('draggable', true);
 }
 
 function addDragEvents(newStopwatch) {
-	newStopwatch.addEventListener('dragenter', e => {
-		let dividerParent = getParentStopwatch(e.target);
+	newStopwatch.addEventListener('dragover', e => {
+		e.preventDefault();
+	});
+	newStopwatch.addEventListener('dragenter', () => {
+		let dividerParent = newStopwatch;
 		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
 		swObj.dropCount++;
 		dividerParent.querySelector('.divider').style.visibility = 'visible';
 	});
-	newStopwatch.addEventListener('dragleave', e => {
-		let dividerParent = getParentStopwatch(e.target);
+	newStopwatch.addEventListener('dragleave', () => {
+		let dividerParent = newStopwatch;
 		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
 		swObj.dropCount--;
 		if (swObj.dropCount === 0) {
 			dividerParent.querySelector('.divider').style.visibility = '';
 		}
 	})
-	newStopwatch.addEventListener('dragstart', e => {
-		let dividerParent = getParentStopwatch(e.target);
+	newStopwatch.addEventListener('dragstart', () => {
+		let dividerParent = newStopwatch;
+		finalBlock.style.visibility = 'visible';
 		dragged = dividerParent;
 	});
 	newStopwatch.addEventListener('drop', e => {
 		e.preventDefault();
-		let dividerParent = getParentStopwatch(e.target);
+		let dividerParent = newStopwatch;
 		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
 		swObj.dropCount = 0;
 		dividerParent.querySelector('.divider').style.visibility = '';
+		finalBlock.style.visibility = '';
 		if (dragged.id !== dividerParent.id) {
 			dividerParent.parentNode.removeChild(dragged);
 			dividerParent.parentNode.insertBefore(dragged, dividerParent);
@@ -139,7 +145,7 @@ function clickTimeButtonEvent(e) {
 
 function updateStopwatches() {
 	//get array of stopwatches that are currently going
-	let going = stopwatchArray.filter(sw => sw.timeButton.classList.contains('going'));
+	let going = stopwatchArray.filter(sw => sw.timeButton && sw.timeButton.classList.contains('going'));
 	for (let i = 0; i < going.length; i++) { //update each stopwatch in array
 		let dur = (new Date() - going[i].startTime) / 1000;
 		going[i].timeButton.textContent = parseFloat(Math.round((+going[i].prevTime + dur) * 100) / 100).toFixed(2); //round to 2 decimal places
