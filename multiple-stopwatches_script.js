@@ -3,9 +3,11 @@ const template = document.getElementById('template');
 const addStopwatchBtn = document.getElementById('add-stopwatch');
 const removeAll = document.getElementById('remove-all');
 const clearAll = document.getElementById('clear-all');
+const dividerFinal = document.getElementById('divider-final');
 let stopwatchArray = [];
 let numStopwatches = 0;
 let numIds = 0;
+let dragged;
 
 addStopwatchBtn.addEventListener('click', addStopwatch);
 window.addEventListener('keydown', keyDownEvent);
@@ -35,10 +37,56 @@ function addStopwatch() {
 	newName.value = 'Stopwatch ' + (numIds + 1);
 
 	let newDelButton = newStopwatch.querySelector('.remove');
-	newDelButton.addEventListener('click', e => removeStopwatch(e.target.parentNode));
+	newDelButton.addEventListener('click', e => removeStopwatch(e.target.parentNode.parentNode));
 
 	let newClearButton = newStopwatch.querySelector('.clear');
 	newClearButton.addEventListener('click', e => clear(e.target.parentNode));
+
+	let newDivider = newStopwatch.querySelector('.divider');
+	newStopwatch.addEventListener('dragover', e => {
+		e.preventDefault();
+	});
+	newStopwatch.addEventListener('dragenter', e => {
+		let dividerParent = e.target;
+		while (!dividerParent.querySelector('.divider')) {
+			dividerParent = dividerParent.parentNode;
+		}
+		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
+		swObj.dropCount++;
+		dividerParent.querySelector('.divider').style.visibility = 'visible';
+	});
+	newStopwatch.addEventListener('dragleave', e => {
+		let dividerParent = e.target;
+		while (!dividerParent.querySelector('.divider')) {
+			dividerParent = dividerParent.parentNode;
+		}
+		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
+		swObj.dropCount--;
+		if (swObj.dropCount === 0) {
+			dividerParent.querySelector('.divider').style.visibility = '';
+		}
+	})
+	newStopwatch.addEventListener('dragstart', e => {
+		let dividerParent = e.target;
+		while (!dividerParent.querySelector('.divider')) {
+			dividerParent = dividerParent.parentNode;
+		}
+		dragged = dividerParent;
+	});
+	newStopwatch.addEventListener('drop', e => {
+		e.preventDefault();
+		let dividerParent = e.target;
+		while (!dividerParent.querySelector('.divider')) {
+			dividerParent = dividerParent.parentNode;
+		}
+		swObj = stopwatchArray.find(sw => sw.id === dividerParent.id);
+		swObj.dropCount = 0;
+		dividerParent.querySelector('.divider').style.visibility = '';
+		if (dragged.id !== dividerParent.id) {
+			dividerParent.parentNode.removeChild(dragged);
+			dividerParent.parentNode.insertBefore(dragged, dividerParent);
+		}
+	});
 
 	let newStopwatchObj = {id: numIds.toString(),
 						name: newName.value,
@@ -47,9 +95,10 @@ function addStopwatch() {
 						timeButton: newTimeButton,
 						prevTime: 0,
 						startTime: 0,
+						dropCount: 0,
 						};
 	stopwatchArray.push(newStopwatchObj);
-	allStopwatches.appendChild(newStopwatch);
+	allStopwatches.insertBefore(newStopwatch, dividerFinal);
 	numIds++;
 	numStopwatches++;
 }
@@ -107,7 +156,7 @@ function keybindChangeEvent(e) {
 			}
 		}
 	}
-	stopwatchArray.find(sw => e.target.parentNode.parentNode.id === sw.id).keybind = e.target.value;
+	stopwatchArray.find(sw => e.target.parentNode.parentNode.parentNode.id === sw.id).keybind = e.target.value;
 }
 
 //stopwatch array

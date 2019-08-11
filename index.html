@@ -12,13 +12,17 @@
 	</div>
 	<div id="toolbar-space"></div>
 	<div id="all-stopwatches">
-		<div class="stopwatch" id="template">
-			<input class="name" type="text" value="Stopwatch 1">
-			<button class="remove">X</button>
-			<div class="time"><button>0.00</button></div>
-			<button class="clear">Clear</button>
-			<div class="keybind"><span>Keybind: </span><input type="text" value="a" maxlength="1"></div>
+		<div class="stopwatch-divider" id="template" draggable="true">
+			<div class="divider"></div>
+			<div class="stopwatch">
+				<input class="name" type="text" value="Stopwatch 1">
+				<button class="remove">X</button>
+				<div class="time"><button>0.00</button></div>
+				<button class="clear">Clear</button>
+				<div class="keybind"><span>Keybind: </span><input type="text" value="a" maxlength="1"></div>
+			</div>
 		</div>
+		<div id="divider-final"></div>
 	</div>
 	<script src="./multiple-stopwatches_script.js"></script>
 </body>

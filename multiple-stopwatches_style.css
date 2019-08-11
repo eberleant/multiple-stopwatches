@@ -24,13 +24,37 @@ body {
 	display: none;
 }
 
+.stopwatch-divider {
+	display: inline-block;
+	width: 212px;
+	height: 200px;
+	padding: 10px 10px 10px 0;
+}
+
 .stopwatch {
 	background-color: cornsilk;
 	display: inline-block;
 	width: 200px;
 	height: 200px;
+	margin-left: 10px;
 	font-family: system-ui;
-	margin: 10px;
+}
+
+.divider, #divider-final {
+	display: inline-block;
+	background-color: gray;
+	height: 200px;
+	width: 2px;
+	vertical-align: top;
+	visibility: hidden;
+}
+
+.divider {
+	float: left;
+}
+
+#divider-final {
+	margin-top: 10px;
 }
 
 .name {
