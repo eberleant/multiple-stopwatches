@@ -1,22 +1,31 @@
 const allStopwatches = document.getElementById('all-stopwatches');
-const stopwatch = document.querySelector('div.stopwatch');
-const timeBtn = document.querySelector('.time button');
-const keybind = document.querySelector('.keybind input');
+const template = document.getElementById('template');
 const addStopwatchBtn = document.getElementById('add-stopwatch');
-let stopwatchArray = [{id: 0, name: 'Stopwatch 1', stopwatch, keybind: 'a', timeButton: timeBtn, prevTime: 0, startTime: 0}];
-let numStopwatches = 1;
-let numIds = 1;
+const removeAll = document.getElementById('remove-all');
+const clearAll = document.getElementById('clear-all');
+let stopwatchArray = [];
+let numStopwatches = 0;
+let numIds = 0;
 
-addStopwatchBtn.addEventListener('click', e => {
-	let newStopwatch = stopwatch.cloneNode(true);
-	clear(newStopwatch);
-	newStopwatch.classList.remove("0");
-	newStopwatch.classList.add(numIds);
+addStopwatchBtn.addEventListener('click', addStopwatch);
+window.addEventListener('keydown', keyDownEvent);
+removeAll.addEventListener('click', () => {
+	while (stopwatchArray.length > 0) {
+		removeStopwatch(stopwatchArray[0].stopwatch);
+	}
+	numIds = 0; //reset IDs, since there is no chance of conflict
+});
+clearAll.addEventListener('click', () => stopwatchArray.forEach(sw => clear(sw.stopwatch)));
+addStopwatch();
+
+setInterval(updateStopwatches, 10);
+
+function addStopwatch() {
+	let newStopwatch = template.cloneNode(true);
+	newStopwatch.id = numIds.toString();
 
 	let newKeybind = newStopwatch.querySelector('.keybind input');
-	newKeybind.addEventListener('change', e => keybindChangeEvent(e));
-	newKeybind.classList.remove("0");
-	newKeybind.classList.add(numIds);
+	newKeybind.addEventListener('change', keybindChangeEvent);
 	newKeybind.value = '';
 
 	let newTimeButton = newStopwatch.querySelector('.time button');
@@ -25,7 +34,13 @@ addStopwatchBtn.addEventListener('click', e => {
 	let newName = newStopwatch.querySelector('.name');
 	newName.value = 'Stopwatch ' + (numIds + 1);
 
-	let newStopwatchObj = {id: numIds,
+	let newDelButton = newStopwatch.querySelector('.remove');
+	newDelButton.addEventListener('click', e => removeStopwatch(e.target.parentNode));
+
+	let newClearButton = newStopwatch.querySelector('.clear');
+	newClearButton.addEventListener('click', e => clear(e.target.parentNode));
+
+	let newStopwatchObj = {id: numIds.toString(),
 						name: newName.value,
 						stopwatch: newStopwatch,
 						keybind: '',
@@ -37,7 +52,7 @@ addStopwatchBtn.addEventListener('click', e => {
 	allStopwatches.appendChild(newStopwatch);
 	numIds++;
 	numStopwatches++;
-});
+}
 
 function clear(sw) {
 	let tb = sw.querySelector('.time button');
@@ -45,13 +60,11 @@ function clear(sw) {
 	tb.textContent = '0.00';
 }
 
-timeBtn.addEventListener('click', e => clickTimeButtonEvent(e));
-
-keybind.addEventListener('change', e => keybindChangeEvent(e));
-
-window.addEventListener('keydown', keyDownEvent);
-
-setInterval(updateStopwatches, 10);
+function removeStopwatch(toRemove) {
+	stopwatchArray.splice(stopwatchArray.findIndex(sw => toRemove.id === sw.id), 1);
+	allStopwatches.removeChild(toRemove);
+	numStopwatches--;
+}
 
 function clickTimeButtonEvent(e) {
 	e.target.classList.toggle('going');
@@ -94,7 +107,7 @@ function keybindChangeEvent(e) {
 			}
 		}
 	}
-	stopwatchArray.find(sw => e.target.classList.contains(sw.id)).keybind = e.target.value;
+	stopwatchArray.find(sw => e.target.parentNode.parentNode.id === sw.id).keybind = e.target.value;
 }
 
 //stopwatch array

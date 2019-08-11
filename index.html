@@ -7,14 +7,17 @@
 </head>
 <body>
 	<div id="toolbar">
-		<button>Clear All</button><button>Delete All</button><button id="add-stopwatch">Add a Stopwatch</button><button>Add a Macro</button>
+		<button id="clear-all">Clear All</button><button id="remove-all">Remove All</button><!--
+		--><button id="add-stopwatch">Add a Stopwatch</button><button>Add a Macro</button>
 	</div>
+	<div id="toolbar-space"></div>
 	<div id="all-stopwatches">
-		<div class="stopwatch 0">
+		<div class="stopwatch" id="template">
 			<input class="name" type="text" value="Stopwatch 1">
-			<button class="delete"><div>X</div></button>
+			<button class="remove">X</button>
 			<div class="time"><button>0.00</button></div>
-			<div class="keybind"><span>Keybind: </span><input class="0" type="text" value="a" maxlength="1"></div>
+			<button class="clear">Clear</button>
+			<div class="keybind"><span>Keybind: </span><input type="text" value="a" maxlength="1"></div>
 		</div>
 	</div>
 	<script src="./multiple-stopwatches_script.js"></script>

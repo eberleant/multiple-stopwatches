@@ -2,6 +2,28 @@ body {
 	background-color: white;
 }
 
+#toolbar {
+	height: 50px;
+	width: 100%;
+	background-color: lightsteelblue;
+	position: fixed;
+}
+
+#toolbar button {
+	height: 30px;
+	width: 150px;
+	font-size: 1em;
+	margin: 10px;
+}
+
+#toolbar-space {
+	height: 50px;
+}
+
+#template {
+	display: none;
+}
+
 .stopwatch {
 	background-color: cornsilk;
 	display: inline-block;
@@ -23,7 +45,7 @@ body {
 	border: 1px solid #d0d0d0;
 }
 
-.delete {
+.remove {
 	outline: none;
 	background-color: #ff3c3c;
 	color: white;
@@ -34,14 +56,13 @@ body {
 	padding: 0;
 	border: none;
 	float: right;
-	position: relative;
 }
 
-.delete:active {
+.remove:active {
 	background-color: #ff8484;
 }
 
-.time button{
+.time button, .time button:active{
 	outline: none;
 	display: block;
 	background-color: #ffb2b2;
@@ -58,10 +79,26 @@ body {
 	background-color: #88e888;
 }
 
+.clear {
+	float: left;
+	margin: 0 10px;
+}
+
+button {	
+	-webkit-appearance: none;
+	outline: none;
+	background-color: white;
+}
+
+button:active {
+	background-color: lightgray;
+}
+
 .keybind {
 	width: 100px;
 	display: block;
-	margin: 0 auto;
+	float: right;
+	margin: 0 10px;
 }
 
 .keybind span {
