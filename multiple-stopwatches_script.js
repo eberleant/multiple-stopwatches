@@ -9,7 +9,7 @@ const addMacroDiv = document.getElementById('add-macro-div');
 const addMacroBtn = document.getElementById('add-macro');
 const addMacroInput = document.getElementById('add-macro-input');
 const finalBlock = document.getElementById('0');
-const sidebarList = document.querySelector('#sidebar ul')
+const sidebarList = document.querySelector('#sidebar div')
 let stopwatchArray = [];
 let checkedObj = {};
 let keybindObj = {};
@@ -234,11 +234,14 @@ function keybindChangeEvent(e) {
 function checkKeybindAvailable(kb) {
 	let swArray = keybindObj[kb];
 	if (swArray && swArray.length > 0) {
-		if (confirm('The stopwatch(es) ' + swArray.map(sw => sw.name).join() + ' already has this keybind. Replace?')) {
+		if (confirm('The stopwatch(es) ' + swArray.map(sw => sw.name).join(', ') + ' already has this keybind. Replace?')) {
 			if (swArray.length == 1) { //individual keybind
 				swArray[0].stopwatch.querySelector('.keybind input').value = '';
 			} else { //macro
-				sidebarList.removeChild(sidebarList.querySelector('#' + kb));
+				console.log('label[for=keybind-' + kb + ']');
+				console.log(sidebarList.querySelector('label[for=keybind-' + kb + ']'));
+				sidebarList.removeChild(document.getElementById('keybind-' + kb));
+				sidebarList.removeChild(sidebarList.querySelector('label[for=keybind-' + kb + ']'));
 			}
 			keybindObj[kb] = [];
 		} else {
@@ -263,9 +266,10 @@ function nameChangeEvent(e) {
 }
 
 function addMacroKeybind() {
-	if (!isEmpty(checkedObj) && addMacroInput.value.length > 0) {
+	if (Object.keys(checkedObj).length > 1 && addMacroInput.value.length > 0) {
 		if (!checkKeybindAvailable(addMacroInput.value)) return;
-		let listItem = document.createElement('li');
+		let listItem = document.createElement('input');
+		let label = document.createElement('label');
 		let str = '';
 		keybindObj[addMacroInput.value] = [];
 		for (let key in checkedObj) {
@@ -273,25 +277,17 @@ function addMacroKeybind() {
 			str += sw.name + ', ';
 			keybindObj[addMacroInput.value].push(sw);
 		}
-		listItem.textContent = addMacroInput.value + ': ' + str.slice(0, -2);
-		listItem.id = addMacroInput.value;
+		let lineBreak = document.createElement("br");
+		label.textContent = addMacroInput.value + ': ' + str.slice(0, -2);
+		label.htmlFor = 'keybind-' + addMacroInput.value;
+		listItem.type = 'checkbox';
+		listItem.name = 'macro_keybind';
+		listItem.value = addMacroInput.value;
+		listItem.id = 'keybind-' + addMacroInput.value;
 		sidebarList.appendChild(listItem);
+		sidebarList.appendChild(label);
+		sidebarList.appendChild(lineBreak);
+	} else if (Object.keys(checkedObj).length == 1) {
+		alert("Only 1 stopwatch checked - use an individual keybind instead");
 	}
 }
-
-function isEmpty(obj) {
-	for (let key in obj) {
-		if (obj[key] !== undefined) {
-			return false;
-		}
-	}
-	return true;
-}
-
-//stopwatch array
-//each stopwatch has:
-/*
-ID
-keybind
-time button
-*/

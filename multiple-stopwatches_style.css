@@ -39,9 +39,9 @@ h1 {
 	font-size: 1.5em;
 }
 
-ul {
+#sidebar div {
 	list-style-type: disc;
-	padding-left: 30px;
+	padding-left: 15px;
 	margin: 10px;
 }
 
