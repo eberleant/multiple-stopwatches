@@ -1,12 +1,17 @@
-//tab indexes, add multiple stopwatches at once, add macro keybinds, automatically fill in keyboard shortcuts
+//add multiple stopwatches at once, add macro keybinds, automatically fill in keyboard shortcuts
 
 const allStopwatches = document.getElementById('all-stopwatches');
 const template = document.getElementById('template');
 const addStopwatchBtn = document.getElementById('add-stopwatch');
 const removeAll = document.getElementById('remove-all');
 const clearAll = document.getElementById('clear-all');
+const addMacroDiv = document.getElementById('add-macro-div');
+const addMacroBtn = document.getElementById('add-macro');
+const addMacroInput = document.getElementById('add-macro-input');
 const finalBlock = document.getElementById('0');
+const sidebarList = document.querySelector('#sidebar ul')
 let stopwatchArray = [];
+let checkedArray = [];
 let numStopwatches = 0;
 let numIds = 1;
 let dragged;
@@ -14,14 +19,42 @@ let dragged;
 addStopwatchBtn.addEventListener('click', addStopwatch);
 window.addEventListener('keydown', keyDownEvent);
 removeAll.addEventListener('click', () => {
-	while (stopwatchArray.length > 0) {
-		removeStopwatch(stopwatchArray[0].stopwatch);
+	let i = 0;
+	while (i < stopwatchArray.length) {
+		if (stopwatchArray[i].stopwatch) {
+			removeStopwatch(stopwatchArray[i].stopwatch);
+		} else {
+			i++;
+		}
 	}
-	numIds = 0; //reset IDs, since there is no chance of conflict
+	numIds = 1; //reset IDs, since there is no chance of conflict
 });
-clearAll.addEventListener('click', () => stopwatchArray.forEach(sw => clear(sw.stopwatch)));
+clearAll.addEventListener('click', () => stopwatchArray.forEach(sw => {
+	if (sw.stopwatch) {
+		clear(sw.stopwatch);
+	}
+}));
+addMacroBtn.addEventListener('click', e => {
+	if (addMacroDiv.classList.toggle('active')) {
+		clearAll.disabled = 'true';
+		removeAll.disabled = 'true';
+		addStopwatchBtn.disabled = 'true';
+	} else {
+		console.log('here');
+		clearAll.disabled = '';
+		removeAll.disabled = '';
+		addStopwatchBtn.disabled = '';
+		addMacroKeybind();
+		checkedArray = [];
+	}
+	stopwatchArray.forEach(sw => {
+		if (sw.stopwatch) {	
+			let delButton = sw.stopwatch.querySelector('.remove');
+			toggleMacroMode(delButton);
+		}
+	});
+});
 addDragEvents(finalBlock);
-const body = document.querySelector('body');
 stopwatchArray.push({id: "0", dropCount: 0});
 addStopwatch();
 
@@ -32,9 +65,9 @@ function addStopwatch() {
 	newStopwatch.id = numIds.toString();
 
 	let newKeybind = newStopwatch.querySelector('.keybind input');
+	newKeybind.value = numIds <= 10 ? (numIds % 10).toString() : '';
 	newKeybind.addEventListener('change', keybindChangeEvent);
-	newKeybind.value = '';
-	newKeybind.addEventListener('focus', e => disableDrag(e, newStopwatch));
+	newKeybind.addEventListener('focus', e => disableDrag(newStopwatch));
 	newKeybind.addEventListener('focusout', e => enableDrag(newStopwatch));
 
 	let newTimeButton = newStopwatch.querySelector('.time button');
@@ -42,11 +75,12 @@ function addStopwatch() {
 
 	let newName = newStopwatch.querySelector('.name');
 	newName.value = 'Stopwatch ' + (numIds);
-	newName.addEventListener('focus', e => disableDrag(e, newStopwatch));
+	newName.addEventListener('change', nameChangeEvent);
+	newName.addEventListener('focus', e => disableDrag(newStopwatch));
 	newName.addEventListener('focusout', e => enableDrag(newStopwatch));
 
 	let newDelButton = newStopwatch.querySelector('.remove');
-	newDelButton.addEventListener('click', e => removeStopwatch(e.target.parentNode.parentNode));
+	newDelButton.addEventListener('click', removeStopwatchUsingEvent);
 
 	let newClearButton = newStopwatch.querySelector('.clear');
 	newClearButton.addEventListener('click', e => clear(e.target.parentNode));
@@ -56,7 +90,7 @@ function addStopwatch() {
 	let newStopwatchObj = {id: numIds.toString(),
 						name: newName.value,
 						stopwatch: newStopwatch,
-						keybind: '',
+						keybind: numIds <= 10 ? (numIds % 10).toString() : '',
 						timeButton: newTimeButton,
 						prevTime: 0,
 						startTime: 0,
@@ -68,8 +102,7 @@ function addStopwatch() {
 	numStopwatches++;
 }
 
-function disableDrag(e, newStopwatch) {
-	e.target.selectionStart = e.target.selectionEnd = 0;
+function disableDrag(newStopwatch) {
 	newStopwatch.setAttribute('draggable', false);
 }
 
@@ -134,6 +167,37 @@ function removeStopwatch(toRemove) {
 	numStopwatches--;
 }
 
+function removeStopwatchUsingEvent(e) {
+	removeStopwatch(getParentStopwatch(e.target));
+}
+
+function toggleCheckForMacro(e) {
+	let id = getParentStopwatch(e.target).id;
+	let index = checkedArray.indexOf(id);
+	if (index >= 0) {
+		checkedArray.splice(index, 1);
+		e.target.style.color = '';
+		console.log('removed');
+	} else {
+		checkedArray.push(id);
+		e.target.style.color = 'black';
+		console.log('added');
+	}
+}
+
+function toggleMacroMode(button) {
+	if (button.classList.toggle('check')) { // returns true if 'check' is added to classList
+		button.removeEventListener('click', removeStopwatchUsingEvent);
+		button.addEventListener('click', toggleCheckForMacro);
+		button.textContent = '\u2714';
+	} else {
+		button.removeEventListener('click', toggleCheckForMacro);
+		button.addEventListener('click', removeStopwatchUsingEvent);
+		button.textContent = '\u2715';
+		button.style.color = '';
+	}
+}
+
 function clickTimeButtonEvent(e) {
 	e.target.classList.toggle('going');
 	let stopwatchObj = stopwatchArray.find(sw => e.target === sw.timeButton);
@@ -175,7 +239,28 @@ function keybindChangeEvent(e) {
 			}
 		}
 	}
-	stopwatchArray.find(sw => e.target.parentNode.parentNode.parentNode.id === sw.id).keybind = e.target.value;
+	stopwatchArray.find(sw => getParentStopwatch(e.target).id === sw.id).keybind = e.target.value;
+}
+
+function nameChangeEvent(e) {
+	let stopwatchChanged = stopwatchArray.find(sw => getParentStopwatch(e.target).id === sw.id);
+	if (stopwatchChanged) {
+		stopwatchChanged.name = e.target.value;
+	}
+}
+
+function addMacroKeybind() {
+	if (checkedArray.length > 0 && addMacroInput.value.length > 0) {
+		let listItem = document.createElement('li');
+		let str = '';
+		checkedArray.forEach(elt => {
+			let sw = stopwatchArray.find(sw => elt === sw.id);
+			str += sw ? sw.name + ', ' : '';
+		});
+		str = str.slice(0, -2);
+		listItem.textContent = addMacroInput.value + ': ' + str;
+		sidebarList.appendChild(listItem);
+	}
 }
 
 //stopwatch array

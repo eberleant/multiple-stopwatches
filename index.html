@@ -8,24 +8,34 @@
 <body>
 	<div id="toolbar">
 		<button id="clear-all">Clear All</button><button id="remove-all">Remove All</button><!--
-		--><button id="add-stopwatch">Add a Stopwatch</button><button>Add a Macro</button>
-	</div>
-	<div id="toolbar-space"></div>
-	<div id="all-stopwatches">
-		<div class="stopwatch-divider" id="template" draggable="true">
-			<div class="divider"></div>
-			<div class="stopwatch">
-				<input class="name" type="text" value="Stopwatch 1" tabindex="1">
-				<button class="remove" tabindex="-1">X</button>
-				<div class="time"><button tabindex="-1">0.00</button></div>
-				<button class="clear" tabindex="-1">Clear</button>
-				<div class="keybind"><span>Keybind: </span><input type="text" value="a" maxlength="1" tabindex="2"></div>
-			</div>
+		--><button id="add-stopwatch">Add a Stopwatch</button><!--
+		--><div id="add-macro-div" class="inline-block">
+			<button id="add-macro">Add a Macro</button><!--
+			--><input id="add-macro-input" type="text" maxlength="1">
 		</div>
-		<div class="stopwatch-divider" id="0">
-			<div class="divider" id="final-divider"></div>
-			<div class="stopwatch" id="final-stopwatch">
-				<div>drag here to move to end</div>
+	</div>
+	<div class="main">
+		<div id="sidebar">
+			<h1>List of Macro Keybinds</h1>
+			<ul>
+			</ul>
+		</div>
+		<div id="all-stopwatches">
+			<div class="stopwatch-divider" id="template" draggable="true">
+				<div class="divider"></div>
+				<div class="stopwatch">
+					<input class="name" type="text" value="Stopwatch 1" tabindex="1">
+					<button class="remove" tabindex="-1">&#10005</button>
+					<div class="time"><button tabindex="-1">0.00</button></div>
+					<button class="clear" tabindex="-1">Clear</button>
+					<div class="keybind"><span>Keybind: </span><input type="text" value="a" maxlength="1" tabindex="2"></div>
+				</div>
+			</div>
+			<div class="stopwatch-divider" id="0">
+				<div class="divider" id="final-divider"></div>
+				<div class="stopwatch" id="final-stopwatch">
+					<div>drag here to move to end</div>
+				</div>
 			</div>
 		</div>
 	</div>
