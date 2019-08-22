@@ -238,10 +238,10 @@ function checkKeybindAvailable(kb) {
 			if (swArray.length == 1) { //individual keybind
 				swArray[0].stopwatch.querySelector('.keybind input').value = '';
 			} else { //macro
-				console.log('label[for=keybind-' + kb + ']');
-				console.log(sidebarList.querySelector('label[for=keybind-' + kb + ']'));
-				sidebarList.removeChild(document.getElementById('keybind-' + kb));
-				sidebarList.removeChild(sidebarList.querySelector('label[for=keybind-' + kb + ']'));
+				let identifier = 'keybind-' + kb;
+				sidebarList.removeChild(document.getElementById(identifier));
+				sidebarList.removeChild(sidebarList.querySelector('label[for=' + identifier + ']'));
+				sidebarList.removeChild(sidebarList.querySelector('.' + identifier));
 			}
 			keybindObj[kb] = [];
 		} else {
@@ -270,6 +270,8 @@ function addMacroKeybind() {
 		if (!checkKeybindAvailable(addMacroInput.value)) return;
 		let listItem = document.createElement('input');
 		let label = document.createElement('label');
+		let identifier = 'keybind-' + addMacroInput.value;
+		let lineBreak = document.createElement("br");
 		let str = '';
 		keybindObj[addMacroInput.value] = [];
 		for (let key in checkedObj) {
@@ -277,13 +279,13 @@ function addMacroKeybind() {
 			str += sw.name + ', ';
 			keybindObj[addMacroInput.value].push(sw);
 		}
-		let lineBreak = document.createElement("br");
+		lineBreak.classList.add(identifier);
 		label.textContent = addMacroInput.value + ': ' + str.slice(0, -2);
-		label.htmlFor = 'keybind-' + addMacroInput.value;
+		label.htmlFor = identifier;
 		listItem.type = 'checkbox';
 		listItem.name = 'macro_keybind';
 		listItem.value = addMacroInput.value;
-		listItem.id = 'keybind-' + addMacroInput.value;
+		listItem.id = identifier;
 		sidebarList.appendChild(listItem);
 		sidebarList.appendChild(label);
 		sidebarList.appendChild(lineBreak);
