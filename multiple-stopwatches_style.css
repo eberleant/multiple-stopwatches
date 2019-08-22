@@ -39,17 +39,24 @@ h1 {
 	font-size: 1.5em;
 }
 
+#sidebar input[type="checkbox"] {
+	margin: 3px 8px 3px 0;
+}
+
+#sidebar label {
+	vertical-align: middle;
+}
+
 #sidebar div {
 	list-style-type: disc;
-	padding-left: 15px;
-	margin: 10px;
+	margin: 10px 0;
 }
 
 .main {
 	padding-top: 50px;
 }
 
-#template {
+#template, #macro-li-template {
 	display: none;
 }
 
