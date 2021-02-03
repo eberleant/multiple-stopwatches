@@ -78,6 +78,7 @@ function addStopwatch() {
 
 	let newKeybind = newStopwatch.querySelector('.keybind input');
 	newKeybind.addEventListener('change', keybindChangeEvent);
+	newKeybind.addEventListener('focus', saveOldKeybind)
 	newKeybind.addEventListener('focus', () => disableDrag(newStopwatch));
 	newKeybind.addEventListener('focusout', () => enableDrag(newStopwatch));
 
@@ -194,7 +195,10 @@ function removeStopwatch(toRemove) {
 function updateMacroString(key) {
 	let str = '';
 	keybindObj[key].forEach(sw => str += sw.name + ', ');
-	sidebarList.querySelector('label[for=cb-keybind-' + key + ']').textContent = key + ': ' + str.slice(0, -2);
+	let sidebarItem = sidebarList.querySelector('label[for=cb-keybind-' + key + ']')
+	if (sidebarItem) {
+		sidebarItem.textContent = key + ': ' + str.slice(0, -2);
+	}
 }
 
 function removeStopwatchUsingEvent(e) {
@@ -254,10 +258,16 @@ function keyDownEvent(e) {
 	}
 }
 
+function saveOldKeybind(e) {
+	e.target.oldValue = e.target.value
+}
+
 function keybindChangeEvent(e) {
 	if (e.target.value !== '') {
 		if (!checkKeybindAvailable(e.target.value)) return;
 		keybindObj[e.target.value] = [stopwatchArray.find(sw => getParentStopwatch(e.target).id === sw.id)];
+	} else {
+		removeKeybind(e.target.oldValue)
 	}
 }
 
