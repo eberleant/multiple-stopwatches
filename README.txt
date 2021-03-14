@@ -1,1 +1,0 @@
-Create, name, and bind a key to multiple stopwatches. Pressing the keybind will toggle between starting and stopping.
